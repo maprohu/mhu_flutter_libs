@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:mhu_props/mhu_props.dart';
 import 'package:protobuf/protobuf.dart';
 
 import 'props.dart';
@@ -9,7 +10,8 @@ extension ReadWritableExt<T> on ReadWritable<T> {
   }
 }
 
-extension ReadWriteListenableExt<A extends GeneratedMessage> on ReadWriteListenable<A> {
+extension ProtoReadWriteListenableExt<A extends GeneratedMessage>
+    on ReadWriteListenable<A> {
   ScalarValueHolder<B> createProperty<B>({
     required B Function(A parent) read,
     required void Function(A parent, B value) write,
@@ -39,5 +41,31 @@ extension ReadWriteListenableExt<A extends GeneratedMessage> on ReadWriteListena
     );
 
     return newProp;
+  }
+}
+
+extension ReadWriteListenableExt<A> on ReadWriteListenable<A> {
+  ScalarValueHolder<B> withWriteConverter<B>(
+    Converter<A, B> converter,
+  ) {
+    final parent = this;
+    final newProp = ScalarValueHolder<B>(converter.aToB(parent.read()));
+    newProp.addListener(() {
+      parent.write(converter.bToA(newProp.read()));
+    });
+
+    return newProp;
+  }
+}
+
+extension BinaryReadWriteListenableExt on ReadWriteListenable<Uint8List> {
+  ScalarValueHolder<B> withProtoSerializer<B extends GeneratedMessage>({
+    required B emptyMessage,
+  }) {
+    return withWriteConverter(
+      ProtobufBinaryConverter(
+        emptyMessage: emptyMessage,
+      ),
+    );
   }
 }

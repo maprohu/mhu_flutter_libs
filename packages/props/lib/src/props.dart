@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:protobuf/protobuf.dart';
 
 abstract interface class Readable<T> {
   T read();
@@ -71,5 +72,24 @@ class ScalarValueHolder<T> extends ValueNotifier<T>
   @override
   void write(T value) {
     this.value = value;
+  }
+}
+
+class ProtobufBinaryConverter<M extends GeneratedMessage>
+    implements Converter<Uint8List, M> {
+  final M emptyMessage;
+
+  ProtobufBinaryConverter({required this.emptyMessage});
+
+  @override
+  M aToB(Uint8List a) {
+    return emptyMessage.rebuild((o) {
+      o.mergeFromBuffer(a);
+    });
+  }
+
+  @override
+  Uint8List bToA(M b) {
+    return b.writeToBuffer();
   }
 }

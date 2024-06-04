@@ -1,4 +1,4 @@
-name: mhu_props
+name: mhu_base
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
@@ -9,7 +9,5 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  protobuf: ^3.1.0
-  fixnum: ^1.1.0
   
 

@@ -16,3 +16,4 @@ dependencies:
     path: ../props
     
   hive: ^2.2.3
+  protobuf: ^3.1.0
