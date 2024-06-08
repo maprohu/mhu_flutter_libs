@@ -33,10 +33,10 @@ extension ProtoReadWriteListenableExt<A extends GeneratedMessage>
       );
     }
 
-    newProp.addListener(update);
+    addListener(update);
     addDisposer?.call(
       () {
-        newProp.removeListener(update);
+        removeListener(update);
       },
     );
 
