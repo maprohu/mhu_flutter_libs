@@ -20,24 +20,10 @@ Future<BinaryCache> createBinaryCache(String name) async {
     },
   );
 
-  return BinaryCacheIdb(name: name, database: database);
-}
-
-
-class BinaryCacheIdb implements BinaryCache {
-  final String name;
-  final Database database;
-
-  BinaryCacheIdb({required this.name, required this.database});
-
-  Future<T> readonly<T>(Future<T> Function(ObjectStore store) action,) =>
-      txn(false, action);
-
-  Future<T> readwrite<T>(Future<T> Function(ObjectStore store) action,) =>
-      txn(true, action);
-
-  Future<T> txn<T>(bool write,
-      Future<T> Function(ObjectStore store) action,) async {
+  Future<T> txn<T>(
+    bool write,
+    Future<T> Function(ObjectStore store) action,
+  ) async {
     final mode = write ? "readwrite" : "readonly";
     final tx = database.transaction(name, mode);
     final store = tx.objectStore(name);
@@ -49,7 +35,25 @@ class BinaryCacheIdb implements BinaryCache {
     }
   }
 
-  @override
+  Future<T> readonly<T>(
+    Future<T> Function(ObjectStore store) action,
+  ) =>
+      txn(false, action);
+
+  Future<T> readwrite<T>(
+    Future<T> Function(ObjectStore store) action,
+  ) =>
+      txn(true, action);
+
+  Future<void> put(String key, Uint8List bytes) async {
+    await readwrite((store) async {
+      await store.put({
+        _keyProp: key,
+        _dataProp: bytes,
+      });
+    });
+  }
+
   Future<Uint8List> get(String key, Future<Uint8List> Function() fetch) async {
     final existing = await readonly((store) async {
       final record = await store.getObject(key) as Map?;
@@ -67,13 +71,24 @@ class BinaryCacheIdb implements BinaryCache {
 
     final fetched = await fetch();
 
-    await readwrite((store) async {
-      await store.put({
-        _keyProp: key,
-        _dataProp: fetched,
-      });
-    });
-    
+    await put(key, fetched);
+
     return fetched;
   }
+
+  Future<List<String>> listKeys() async {
+    return await readonly(
+      (store) async {
+        final objects = await store.getAllKeys();
+        return objects.cast<String>();
+      },
+    );
+  }
+
+  return (
+    get: get,
+    put: put,
+    listKeys: listKeys,
+    path: name,
+  );
 }

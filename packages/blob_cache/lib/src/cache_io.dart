@@ -14,29 +14,38 @@ Future<BinaryCache> createBinaryCache(String name) async {
     name,
   );
 
-  final cacheDir = Directory(cacheDirPath);
-  await cacheDir.create(recursive: true);
+  final directory = Directory(cacheDirPath);
+  await directory.create(recursive: true);
 
-  return BinaryCacheIo(directory: cacheDir);
-}
+  return (
+    get: (
+      String key,
+      Future<Uint8List> Function() fetch,
+    ) async {
+      final file = File(
+        p.join(directory.path, key),
+      );
 
-class BinaryCacheIo implements BinaryCache {
-  final Directory directory;
+      if (!await file.exists()) {
+        final fetched = await fetch();
+        await file.writeAsBytes(fetched);
+        return fetched;
+      }
 
-  BinaryCacheIo({required this.directory});
-
-  @override
-  Future<Uint8List> get(String key, Future<Uint8List> Function() fetch) async {
-    final file = File(
-      p.join(directory.path, key),
-    );
-    
-    if (!await file.exists()) {
-      final fetched = await fetch();
-      await file.writeAsBytes(fetched);
-      return fetched;
-    }
-    
-    return await file.readAsBytes();
-  }
+      return await file.readAsBytes();
+    },
+    put: (String key, Uint8List bytes) async {
+      final file = File(
+        p.join(directory.path, key),
+      );
+      await file.writeAsBytes(bytes);
+    },
+    listKeys: () async {
+      final entries = await directory.list().toList();
+      return [
+        for (final entry in entries) p.split(entry.path).last,
+      ];
+    },
+    path: directory.absolute.path,
+  );
 }

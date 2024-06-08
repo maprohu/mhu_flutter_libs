@@ -69,3 +69,18 @@ extension BinaryReadWriteListenableExt on ReadWriteListenable<Uint8List> {
     );
   }
 }
+
+extension ValueListenableExt<V> on ValueListenable<V> {
+  VoidCallback fireAndAddValueListener(void Function(V value) listener) {
+    listener(value);
+    return addValueListener(listener);
+  }
+
+  VoidCallback addValueListener(void Function(V value) listener) {
+    final trigger = () => listener(value);
+    addListener(trigger);
+    return () {
+      removeListener(trigger);
+    };
+  }
+}
