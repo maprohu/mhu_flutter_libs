@@ -58,18 +58,10 @@ packages:
     dependency: "direct main"
     description:
       name: idb_shim
-      sha256: "0566abfc41fa38889a4575f371d54860f069a7bcf6fcfdf8cf6a242e9d5e248f"
+      sha256: "8016b1c0bba245d8a88711ce8a801646d0f48c95d3f6a82a6463ef0157846acf"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.1+1"
-  js:
-    dependency: transitive
-    description:
-      name: js
-      sha256: c1b2e9b5ea78c45e1a0788d29606ba27dc5f71f019f32ca5140f61ef071838cf
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.1"
+    version: "2.5.0+1"
   logger:
     dependency: "direct main"
     description:
@@ -170,10 +162,10 @@ packages:
     dependency: transitive
     description:
       name: sembast
-      sha256: dbe19600cff55d43f19405be79138c3fd2c08a87b0b152b18609b9427d113a64
+      sha256: "2a768b145bee5c72ae78c2641842ee348a6d345172af1070a497293c44f65ae1"
       url: "https://pub.dev"
     source: hosted
-    version: "3.7.1"
+    version: "3.7.1+2"
   sky_engine:
     dependency: transitive
     description: flutter
