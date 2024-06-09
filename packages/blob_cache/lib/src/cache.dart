@@ -1,7 +1,5 @@
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:mhu_blob_cache/mhu_blob_cache.dart';
 
 export 'cache_none.dart'
     if (dart.library.io) 'cache_io.dart'

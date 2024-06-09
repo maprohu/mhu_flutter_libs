@@ -26,3 +26,27 @@ class AsyncDisposers {
 }
 
 Future<void> asyncNoop() async {}
+
+class Disposers {
+  final _disposers = <VoidCallback>[];
+  var _disposed = false;
+
+  void add(VoidCallback disposer) {
+    if (_disposed) {
+      disposer();
+      return;
+    } else {
+      _disposers.add(disposer);
+    }
+  }
+
+  void dispose() async {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    for (final disposer in _disposers) {
+      disposer();
+    }
+  }
+}
