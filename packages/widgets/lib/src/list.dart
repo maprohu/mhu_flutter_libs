@@ -23,16 +23,18 @@ typedef ListenableListControl<V> = ({
 });
 
 typedef _ItemListenable<V> = ({
-  void Function(V value) setValue,
-  ValueListenable<V> listenable,
+  void Function(V value) trigger,
+  ValueNotifierImpl<V> notifier,
   // void Function(void Function(V value) listener) addListener,
   // void Function(void Function(V value) listener) removeListener,
 });
 
-({
+typedef ListenableListService<K, V extends Object> = ({
   ListenableList<K, V> view,
   ListenableListControl<V> control,
-}) createListenableList<K, V extends Object>({
+});
+
+ListenableListService<K, V> createListenableList<K, V extends Object>({
   required K Function(V value) keyFn,
 }) {
   final values = <V>[];
@@ -50,7 +52,7 @@ typedef _ItemListenable<V> = ({
 
   void fireItem(K key, V? value) {
     itemListenables[key]?.let(
-      (fn) => fn.setValue(value),
+      (fn) => fn.trigger(value),
     );
   }
 
@@ -100,27 +102,29 @@ typedef _ItemListenable<V> = ({
         value: keysCache.get,
       ),
       item: (key) {
-        final itemListenable = itemListenables[key];
-        if (itemListenable == null) {
-          final notifier = ValueNotifierImpl(itemForKey(key));
-          final newListenable = valueListenableOf(
-            addListener: notifier.addListener,
-            removeListener: (listener) {
-              notifier.removeListener(listener);
-              if (!notifier.hasListeners) {
-                itemListenables.remove(key);
-              }
-            },
-            value: notifier.getValue,
-          );
-          itemListenables[key] = (
-            listenable: newListenable,
-            setValue: notifier.setValue,
-          );
-          return newListenable;
-        } else {
-          return itemListenable.listenable;
-        }
+        return valueListenableOf(
+          value: () => itemForKey(key),
+          removeListener: (listener) {
+            final itemListenable = itemListenables[key]!;
+            final notifier = itemListenable.notifier;
+            notifier.removeListener(listener);
+            if (!notifier.hasListeners) {
+              itemListenables.remove(key);
+            }
+          },
+          addListener: (listener) {
+            var itemListenable = itemListenables[key];
+            if (itemListenable == null) {
+              final notifier = ValueNotifierImpl(itemForKey(key));
+              itemListenable = (
+                notifier: notifier,
+                trigger: notifier.setValue,
+              );
+              itemListenables[key] = itemListenable;
+            }
+            itemListenable.notifier.addListener(listener);
+          },
+        );
       },
     ),
   );
@@ -243,3 +247,11 @@ class ValueNotifierImpl<V> extends ValueNotifier<V> {
 
 ValueNotifierImpl<V> createValueNotifier<V>(V value) =>
     ValueNotifierImpl(value);
+
+Iterable<V> listenableListValues<K, V extends Object>(
+  ListenableList<K, V> list,
+) {
+  return list.keys.value.map(
+    (key) => list.item(key).value!,
+  );
+}

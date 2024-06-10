@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:mhu_props/mhu_props.dart';
 
 mixin DisposableStateMixin<T extends StatefulWidget> on State<T> {
   final _disposers = <VoidCallback>[];
@@ -55,5 +56,39 @@ class _DisposingWidgetState extends State<DisposingWidget> {
   @override
   Widget build(BuildContext context) {
     return widget.child;
+  }
+}
+
+StatefulWidgetImpl statefulWidget(
+  Widget Function(AddDisposer addDisposer) builder,
+) =>
+    StatefulWidgetImpl(builder: builder);
+
+class StatefulWidgetImpl extends StatefulWidget {
+  final Widget Function(AddDisposer addDisposer) builder;
+  const StatefulWidgetImpl({super.key, required this.builder});
+
+  @override
+  State<StatefulWidgetImpl> createState() => _StatefulWidgetImplState();
+}
+
+class _StatefulWidgetImplState extends State<StatefulWidgetImpl> {
+  final disposers = Disposers();
+  late Widget state;
+  @override
+  void initState() {
+    super.initState();
+    state = widget.builder(disposers.add);
+  }
+
+  @override
+  void dispose() {
+    disposers.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return state;
   }
 }

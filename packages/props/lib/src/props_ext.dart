@@ -84,3 +84,12 @@ extension ValueListenableExt<V> on ValueListenable<V> {
     };
   }
 }
+
+extension ListenableExt on Listenable {
+  VoidCallback addRemovableListener(VoidCallback listener) {
+    addListener(listener);
+    return () {
+      removeListener(listener);
+    };
+  }
+}
