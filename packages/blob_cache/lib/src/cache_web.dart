@@ -90,5 +90,10 @@ Future<BinaryCache> createBinaryCache(String name) async {
     put: put,
     listKeys: listKeys,
     path: name,
+    clear: () async {
+      await readwrite((store) async {
+        await store.clear();
+      });
+    },
   );
 }

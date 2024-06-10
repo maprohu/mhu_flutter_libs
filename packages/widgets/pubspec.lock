@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  dart_scope_functions:
+    dependency: "direct main"
+    description:
+      name: dart_scope_functions
+      sha256: "1a00fc84ddd263a0893b981ae9d111e694803d1bc3218e0448e4c05f5a795cbd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.7"
   fixnum:
     dependency: transitive
     description:
@@ -53,6 +61,14 @@ packages:
       relative: true
     source: path
     version: "1.0.0+1"
+  optional:
+    dependency: "direct main"
+    description:
+      name: optional
+      sha256: f80327d7a3335a0be68418072668043c7ab291df575c21aa42e0c5633641da39
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.0+1"
   protobuf:
     dependency: "direct main"
     description:
@@ -75,4 +91,4 @@ packages:
     source: hosted
     version: "2.1.4"
 sdks:
-  dart: ">=3.3.4 <4.0.0"
+  dart: ">=3.4.0 <4.0.0"

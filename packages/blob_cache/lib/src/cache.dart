@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 
 export 'cache_none.dart'
@@ -16,6 +15,7 @@ typedef BinaryCache = ({
   ) put,
   Future<List<String>> Function() listKeys,
   String path,
+  Future<void> Function() clear,
 });
 
 typedef BinaryCacheWithStats = ({
@@ -31,15 +31,28 @@ Future<BinaryCacheWithStats> binaryCacheWithStats({
   final keySet = keysList.toSet();
   final count = ValueNotifier(keySet.length);
 
+  void addKey(String key) {
+    keySet.add(key);
+    count.value = keySet.length;
+  }
+
   final BinaryCache newCache = (
-    get: binaryCache.get,
+    get: (key, fetch) async {
+      final result = await binaryCache.get(key, fetch);
+      addKey(key);
+      return result;
+    },
     path: binaryCache.path,
     put: (key, bytes) async {
       await binaryCache.put(key, bytes);
-      keySet.add(key);
-      count.value = keySet.length;
+      addKey(key);
     },
     listKeys: () async => keySet.toList(),
+    clear: () async {
+      await binaryCache.clear();
+      keySet.clear();
+      count.value = 0;
+    },
   );
 
   final BinaryCacheWithStats result = (

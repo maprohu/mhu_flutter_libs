@@ -46,6 +46,12 @@ Future<BinaryCache> createBinaryCache(String name) async {
         for (final entry in entries) p.split(entry.path).last,
       ];
     },
+    clear: () async {
+      final entries = await directory.list().toList();
+      for (final entry in entries) {
+        await entry.delete();
+      }
+    },
     path: directory.absolute.path,
   );
 }
