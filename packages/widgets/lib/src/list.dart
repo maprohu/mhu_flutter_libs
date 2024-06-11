@@ -18,6 +18,7 @@ typedef ListHeadControl<K, V> = ({
 typedef ListenableList<K, V extends Object> = ({
   ValueListenable<List<K>> keys,
   ValueListenable<V?> Function(K key) item,
+  ChangeNotifier changeNotifier,
 });
 
 typedef ListenableListControl<V> = ({
@@ -40,6 +41,8 @@ typedef ListenableListService<K, V extends Object> = ({
 ListenableListService<K, V> createListenableList<K, V extends Object>({
   required K Function(V value) keyFn,
 }) {
+  final changeNotifer = ChangeNotifierImpl();
+
   final values = <V>[];
   final keyToIndex = <K, int>{};
 
@@ -67,6 +70,7 @@ ListenableListService<K, V> createListenableList<K, V extends Object>({
   return (
     control: (
       insertOrUpdate: (items) {
+        bool changed = false;
         bool keysChanged = false;
 
         for (final item in items) {
@@ -80,10 +84,14 @@ ListenableListService<K, V> createListenableList<K, V extends Object>({
             values[index] = item;
           }
           fireItem(key, item);
+          changed = true;
         }
         if (keysChanged) {
           keysCache.invalidate();
           keysChangeNotifier.notifyListeners();
+        }
+        if (changed) {
+          changeNotifer.notifyListeners();
         }
       },
       replaceAll: (items) {
@@ -100,6 +108,7 @@ ListenableListService<K, V> createListenableList<K, V extends Object>({
       },
     ),
     view: (
+      changeNotifier: changeNotifer,
       keys: valueListenableFromListenable(
         listenable: keysChangeNotifier,
         value: keysCache.get,
@@ -142,8 +151,6 @@ ValueListenable<V> valueListenableFromListenable<V>({
       removeListener: listenable.removeListener,
       value: value,
     );
-
-
 
 Iterable<V> listenableListValues<K, V extends Object>(
   ListenableList<K, V> list,
