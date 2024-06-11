@@ -2,6 +2,9 @@ import 'package:dart_scope_functions/dart_scope_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mhu_props/mhu_props.dart';
 
+import 'cache.dart';
+import 'listenable.dart';
+
 typedef ListControl<K, V> = ({
   ValueListenable<ListHeadControl<K, V>> headListenable,
   ValueListenable<V> Function(K key) itemListenable,
@@ -140,113 +143,7 @@ ValueListenable<V> valueListenableFromListenable<V>({
       value: value,
     );
 
-ValueListenable<V> valueListenableOf<V>({
-  required void Function(VoidCallback listener) addListener,
-  required void Function(VoidCallback listener) removeListener,
-  required V Function() value,
-}) =>
-    ValueListenableImpl(
-      addListener: addListener,
-      removeListener: removeListener,
-      value: value,
-    );
 
-class ValueListenableImpl<V> implements ValueListenable<V> {
-  final void Function(VoidCallback listener) _addListener;
-  final void Function(VoidCallback listener) _removeListener;
-  final V Function() _value;
-
-  ValueListenableImpl({
-    required void Function(VoidCallback listener) addListener,
-    required void Function(VoidCallback listener) removeListener,
-    required V Function() value,
-  })  : _addListener = addListener,
-        _removeListener = removeListener,
-        _value = value;
-
-  @override
-  void addListener(VoidCallback listener) {
-    _addListener(listener);
-  }
-
-  @override
-  void removeListener(VoidCallback listener) {
-    _removeListener(listener);
-  }
-
-  @override
-  get value => _value();
-}
-
-class ListenableImpl implements Listenable {
-  final void Function(VoidCallback listener) _addListener;
-  final void Function(VoidCallback listener) _removeListener;
-
-  ListenableImpl({
-    required void Function(VoidCallback listener) addListener,
-    required void Function(VoidCallback listener) removeListener,
-  })  : _addListener = addListener,
-        _removeListener = removeListener;
-  @override
-  void addListener(VoidCallback listener) {
-    _addListener(listener);
-  }
-
-  @override
-  void removeListener(VoidCallback listener) {
-    _removeListener(listener);
-  }
-}
-
-typedef CacheControl<T> = ({
-  T Function() get,
-  void Function() invalidate,
-});
-
-CacheControl<T> createCache<T>(
-  T Function() calculate,
-) {
-  bool hasValue = false;
-  late T cachedValue;
-  return (
-    get: () {
-      if (!hasValue) {
-        cachedValue = calculate();
-      }
-      return cachedValue;
-    },
-    invalidate: () {
-      hasValue = false;
-    }
-  );
-}
-
-class ChangeNotifierImpl extends ChangeNotifier {
-  @override
-  void notifyListeners() {
-    super.notifyListeners();
-  }
-
-  @override
-  bool get hasListeners => super.hasListeners;
-}
-
-ChangeNotifierImpl createChangeNotifer() => ChangeNotifierImpl();
-
-class ValueNotifierImpl<V> extends ValueNotifier<V> {
-  ValueNotifierImpl(super.value);
-
-  @override
-  void notifyListeners() {
-    super.notifyListeners();
-  }
-
-  @override
-  bool get hasListeners => super.hasListeners;
-}
-
-ValueNotifierImpl<V> createValueNotifier<V>(V value) =>
-    ValueNotifierImpl(value);
 
 Iterable<V> listenableListValues<K, V extends Object>(
   ListenableList<K, V> list,
