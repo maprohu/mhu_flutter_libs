@@ -45,8 +45,18 @@ DirtyRunner dirtyRunner(
 
   return (
     run: runner,
-    shutdown: () {
-      return Completer<void>().also((it) => disposed = it).future;
+    shutdown: () async {
+      final currentDisposed = disposed;
+      if (currentDisposed != null) {
+        await currentDisposed;
+        return;
+      }
+      final completer = Completer<void>();
+      disposed = completer;
+      if (!running) {
+        completer.complete(null);
+      }
+      await completer.future;
     },
   );
 }
