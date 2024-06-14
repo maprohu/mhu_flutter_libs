@@ -7,6 +7,10 @@ class AsyncDisposers {
   final _disposers = <AsyncCallback>[];
   var _disposed = false;
 
+  void addSync(VoidCallback disposer) {
+    add(() async => disposer());
+  }
+
   void add(AsyncCallback disposer) {
     if (_disposed) {
       disposer();
@@ -21,7 +25,9 @@ class AsyncDisposers {
       return;
     }
     _disposed = true;
-    await Future.wait(_disposers.map((d) => d()));
+    for (final diposer in _disposers.reversed) {
+      await diposer();
+    }
   }
 }
 
