@@ -68,3 +68,11 @@ class Disposers {
     dispose: disposers.dispose,
   );
 }
+
+extension AddAsyncDisposerExtension on AddAsyncDisposer {
+  AddDisposer toSync() {
+    return (VoidCallback disposer) {
+      this(() async => disposer());
+    };
+  }
+}
