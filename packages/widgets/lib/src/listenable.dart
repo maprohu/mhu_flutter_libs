@@ -149,3 +149,5 @@ ValueListenable<T> mergeValueListenable<T>({
   addDisposer?.call(remove);
   return result;
 }
+
+typedef OptionListenable<T extends Object> = ValueListenable<T?>;

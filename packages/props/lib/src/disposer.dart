@@ -56,3 +56,15 @@ class Disposers {
     }
   }
 }
+
+({
+  T value,
+  AsyncCallback dispose,
+}) asyncDisposed<T>(T Function(AddAsyncDisposer addDisposer) create) {
+  final disposers = AsyncDisposers();
+  final result = create(disposers.add);
+  return (
+    value: result,
+    dispose: disposers.dispose,
+  );
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:mhu_props/mhu_props.dart';
 import 'package:protobuf/protobuf.dart';
 
 abstract interface class Readable<T> {
@@ -92,4 +93,16 @@ class ProtobufBinaryConverter<M extends GeneratedMessage>
   Uint8List bToA(M b) {
     return b.writeToBuffer();
   }
+}
+
+typedef ListenWrite<T> = ({
+  ValueListenable<T> listenable,
+  void Function(T value) write,
+});
+
+ListenWrite<T> listenWriteNotifier<T>(ValueNotifier<T> notifier) {
+  return (
+    listenable: notifier,
+    write: notifier.setValue,
+  );
 }
