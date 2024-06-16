@@ -13,7 +13,7 @@ Future<void> runProtoc({
   final process = await Process.start(
     "protoc",
     [
-      "--dart_out=$outDir",
+      "--dart_out=grpc:$outDir",
       "--proto_path=$inDir",
       // "$inDir/",
       ...Directory(inDir)

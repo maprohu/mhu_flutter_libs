@@ -6,3 +6,4 @@ export 'src/cache.dart';
 export 'src/invalidate.dart';
 export 'src/states.dart';
 export 'src/retry.dart';
+export 'src/future.dart';
